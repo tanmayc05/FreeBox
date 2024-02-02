@@ -11,10 +11,9 @@ num_classes = len(labels)
 # Load data from .npy files
 data = []
 for label in labels:
-    file_path = processed_data_dir + '/' + label
+    file_path = os.path.join(processed_data_dir, label, f"{label}.npy")
     label_data = np.load(file_path, allow_pickle=True)
     data.extend(label_data)
-
 
 # Split data into features (X) and labels (y)
 X = np.array([item[0] for item in data])

@@ -23,6 +23,7 @@ def process_audio_file(file_path, label, segment_length=0.25, overlap=0.1, n_mfc
         segments.append((mfccs, label))
     return segments
 
+
 def process_all_audio_files(raw_data_dir, processed_data_dir, segment_length=0.25, overlap=0.1, n_mfcc=13):
     os.makedirs(processed_data_dir, exist_ok=True)
 
@@ -39,7 +40,7 @@ def process_all_audio_files(raw_data_dir, processed_data_dir, segment_length=0.2
             label_data_np = np.array(label_data, dtype=object)
             
             # Print information about the processed data
-            #print(f"Processed data for {label}: {len(label_data_np)} segments")
+            #print(label_data_np[0])
             
             np.save(os.path.join(processed_data_dir, f"{label}.npy"), label_data_np)
 
