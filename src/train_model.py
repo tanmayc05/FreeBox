@@ -15,9 +15,14 @@ for label in labels:
     label_data = np.load(file_path, allow_pickle=True)
     data.extend(label_data)
 
+np.save("C:/Users/Tanmay Chhimwal/Documents/GitHub/FreeBox/labels.npy", labels)
+
 # Split data into features (X) and labels (y)
 X = np.array([item[0] for item in data])
 y = np.array([labels.index(item[1]) for item in data])
+
+# Print the shape of the data
+print("Shape of X:", X.shape)
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -38,6 +43,10 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 # Train the model
 model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
 
+save_directory = "C:/Users/Tanmay Chhimwal/Documents/GitHub/FreeBox/"
+os.makedirs(save_directory, exist_ok=True)
+model.save(os.path.join(save_directory, "beatbox_model"))
+
 # Evaluate the model
 test_loss, test_acc = model.evaluate(X_test, y_test)
-print(f'Test accuracy: {test_acc}')
+#print(f'Test accuracy: {test_acc}')

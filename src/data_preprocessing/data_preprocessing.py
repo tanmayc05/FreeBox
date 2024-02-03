@@ -21,6 +21,7 @@ def process_audio_file(file_path, label, segment_length=0.25, overlap=0.1, n_mfc
         segment = audio[start:start + segment_samples]
         mfccs = extract_mfcc(segment, sr=sr, n_mfcc=n_mfcc)
         segments.append((mfccs, label))
+        print(mfccs.shape)
     return segments
 
 
