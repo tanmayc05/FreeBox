@@ -13,22 +13,25 @@ def process_audio_clip(file_path, model, labels):
     audio, sr = librosa.load(file_path, sr=None)
 
     # Onset detection
-    onsets = librosa.onset.onset_detect(y=audio, sr=sr)
+    onsets = librosa.onset.onset_detect(y=audio, sr=sr, onset_envelope=librosa.onset.onset_strength(y=audio, sr=sr))
 
-    # Set segment parameters
-    segment_length = 0.25
-    n_mfcc = 13
+    # Set parameters
+    n_mfcc = 16
 
     # Process the audio clip
-    predictions = []
+    predicted_labels = []
+
+    overlap = 0.5
+
 
     for onset in onsets:
-        start = max(0, onset - int(segment_length * sr) // 2)
-        end = min(len(audio), onset + int(segment_length * sr) // 2)
+        overlap_samples = int(overlap * sr)
+        start = max(0, onset - n_mfcc // 2 - overlap_samples // 2)
+        end = min(len(audio), onset + n_mfcc // 2 + overlap_samples // 2)
 
         segment = audio[start:end]
         mfccs = librosa.feature.mfcc(y=segment, sr=sr, n_mfcc=n_mfcc)
-        
+
         # Ensure the input shape matches the one used during training
         if mfccs.shape[1] < 22:
             # Pad the feature matrix with zeros to match the expected shape
@@ -36,13 +39,15 @@ def process_audio_clip(file_path, model, labels):
 
         mfccs = np.expand_dims(mfccs, axis=0)  # Add batch dimension
         prediction = model.predict(mfccs)
-        predictions.append(prediction)
+        
+        # Get the class index with the highest probability
+        class_index = np.argmax(prediction, axis=1)[0]
+        
+        # Map class index to instrument label
+        predicted_label = labels[class_index]
 
-    # Aggregate predictions (you may need to customize this based on your needs)
-    aggregated_predictions = np.argmax(np.mean(predictions, axis=0), axis=1)
-
-    # Map class index to instrument label
-    predicted_labels = [labels[idx] for idx in aggregated_predictions]
+        # Append the predicted label for this onset
+        predicted_labels.append(predicted_label)
 
     return predicted_labels
 
